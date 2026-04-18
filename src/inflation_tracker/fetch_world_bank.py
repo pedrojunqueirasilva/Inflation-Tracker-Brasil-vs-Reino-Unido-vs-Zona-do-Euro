@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import Iterable
 
 import pandas as pd
 import requests
 
-from .config import COUNTRIES, END_YEAR, INDICATORS, START_YEAR, WORLD_BANK_URL
+from .config import (
+    COUNTRIES,
+    END_YEAR,
+    INDICATORS,
+    MAX_API_RETRIES,
+    START_YEAR,
+    WORLD_BANK_URL,
+)
+
+LOGGER = logging.getLogger(__name__)
 
 
 def fetch_indicator(indicator_code: str, indicator_name: str) -> pd.DataFrame:
@@ -22,10 +32,30 @@ def fetch_indicator(indicator_code: str, indicator_name: str) -> pd.DataFrame:
     }
 
     response = None
-    for _ in range(3):
-        response = requests.get(url, params=params, timeout=30)
+    for attempt in range(1, MAX_API_RETRIES + 1):
+        try:
+            response = requests.get(url, params=params, timeout=30)
+        except requests.RequestException as exc:
+            LOGGER.warning(
+                "Request failed for %s on attempt %s/%s: %s",
+                indicator_name,
+                attempt,
+                MAX_API_RETRIES,
+                exc,
+            )
+            time.sleep(1)
+            continue
+
         if response.ok:
             break
+
+        LOGGER.warning(
+            "Non-200 response for %s on attempt %s/%s (status=%s)",
+            indicator_name,
+            attempt,
+            MAX_API_RETRIES,
+            response.status_code,
+        )
         time.sleep(1)
 
     if response is None or not response.ok:

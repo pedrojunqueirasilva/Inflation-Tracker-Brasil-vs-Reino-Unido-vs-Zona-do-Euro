@@ -29,7 +29,7 @@ Country codes:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python /home/runner/work/Inflation-Tracker-Brasil-vs-Reino-Unido-vs-Zona-do-Euro/Inflation-Tracker-Brasil-vs-Reino-Unido-vs-Zona-do-Euro/scripts/run_pipeline.py
+python scripts/run_pipeline.py
 ```
 
 ## Outputs

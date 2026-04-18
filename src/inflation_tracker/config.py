@@ -22,3 +22,4 @@ START_YEAR = 2000
 END_YEAR = datetime.now(timezone.utc).year - 1
 
 WORLD_BANK_URL = "https://api.worldbank.org/v2/country/{countries}/indicator/{indicator}"
+MAX_API_RETRIES = 3
