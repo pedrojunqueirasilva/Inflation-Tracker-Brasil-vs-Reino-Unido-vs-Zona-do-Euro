@@ -35,7 +35,7 @@ def fetch_indicator(indicator_code: str, indicator_name: str) -> pd.DataFrame:
     for attempt in range(1, MAX_API_RETRIES + 1):
         try:
             response = requests.get(url, params=params, timeout=30)
-        except requests.RequestException as exc:
+        except (requests.Timeout, requests.ConnectionError) as exc:
             LOGGER.warning(
                 "Request failed for %s on attempt %s/%s: %s",
                 indicator_name,

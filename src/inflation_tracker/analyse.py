@@ -33,9 +33,8 @@ def generate_key_insights(panel: pd.DataFrame) -> list[str]:
     corr = (
         panel.groupby("country")[["inflation_pct", "real_interest_rate_pct"]]
         .corr()
-        .loc[(slice(None), "inflation_pct"), "real_interest_rate_pct"]
+        .xs("inflation_pct", level=1)["real_interest_rate_pct"]
         .reset_index(name="inflation_interest_corr")
-        .drop(columns="level_1")
     )
 
     fx_latest = latest.set_index("country")["exchange_rate_index_2019_100"].sort_values(ascending=False)
