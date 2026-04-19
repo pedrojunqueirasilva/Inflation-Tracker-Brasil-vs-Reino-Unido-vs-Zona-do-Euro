@@ -58,6 +58,69 @@ The pipeline auto-generates a concise insight file (`key_insights.md`) including
 - Exchange-rate pressure differences
 - Inflation-interest co-movement
 
+## Deploy on Vercel
+
+### Architecture
+The project is deployed as a **static analytics site** on Vercel.  
+At build time, Vercel runs the Python pipeline, fetches live data from the World Bank API, generates interactive Plotly charts, and assembles a self-contained `public/` directory that is then served as static HTML.
+
+```
+build.sh
+  └─ pip install -r requirements.txt
+  └─ python scripts/run_pipeline.py   →  data/processed/ + reports/figures/
+  └─ python scripts/build_site.py     →  public/index.html + public/figures/
+```
+
+### Quick deploy
+1. Fork or clone this repository.
+2. Create a new project on [vercel.com](https://vercel.com) and import the repository.
+3. Vercel will auto-detect `vercel.json` — no additional settings are required.
+4. Click **Deploy**.
+
+### Configuration (`vercel.json`)
+| Setting | Value |
+|---|---|
+| Build command | `bash build.sh` |
+| Output directory | `public/` |
+| Framework preset | None (static) |
+
+### Data-refresh model
+Data is refreshed **on every deployment** (build-time refresh).  
+To keep data current without manual deploys, set up a scheduled redeploy using the Vercel Deploy Hook:
+
+1. Go to **Project → Settings → Git → Deploy Hooks** and create a hook URL.
+2. Trigger the hook on a schedule (e.g., weekly) via GitHub Actions, a cron service, or a CI pipeline.
+
+Example GitHub Actions schedule job (`push_refresh` step not required — just call the hook):
+```yaml
+# .github/workflows/refresh.yml
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Every Monday 06:00 UTC
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel redeploy
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+```
+
+### Environment variables
+No environment variables are required for the current World Bank data sources (public API, no key needed).  
+Reserve the following names for future integrations:
+
+| Name | Purpose |
+|---|---|
+| `BCB_API_KEY` | Banco Central do Brasil (optional, future) |
+| `ONS_API_KEY` | ONS UK data API (optional, future) |
+
+### Troubleshooting
+| Symptom | Likely cause | Resolution |
+|---|---|---|
+| Build fails with `RuntimeError: Failed to fetch indicator` | World Bank API unavailable or rate-limited | Retry deploy; API is public and normally stable |
+| Charts missing from site | `reports/figures/` not created | Check pipeline logs; ensure `run_pipeline.py` succeeded |
+| `public/index.html` shows "No data" messages | Pipeline ran but outputs not found | Verify paths; check for `data/processed/` in build log |
+
 ## Limitations and Caveats
 - This baseline version uses annual frequency to keep cross-country comparability.
 - “Real interest rate” is a broad indicator and not the exact policy rate.

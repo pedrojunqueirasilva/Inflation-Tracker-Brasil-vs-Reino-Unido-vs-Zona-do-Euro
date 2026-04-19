@@ -2,3 +2,10 @@ __pycache__/
 *.pyc
 .venv/
 .ipynb_checkpoints/
+
+# Pipeline-generated outputs (recreated at build time)
+data/
+reports/
+
+# Static site output (built by scripts/build_site.py)
+public/
