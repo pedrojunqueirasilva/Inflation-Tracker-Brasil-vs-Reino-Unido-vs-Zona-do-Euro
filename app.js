@@ -3,9 +3,12 @@ const COUNTRIES = {
   GBR: { name: "United Kingdom", color: "#2D7A4A" },
   EMU: { name: "Euro Area", color: "#C9A961" },
 };
+const COUNTRY_COLOR_BY_NAME = Object.fromEntries(
+  Object.values(COUNTRIES).map((country) => [country.name, country.color]),
+);
 
 const INDICATORS = {
-  inflation_pct: "FP.CPI.TOTL.ZG",
+  inflation_annual_pct: "FP.CPI.TOTL.ZG",
   real_interest_rate_pct: "FR.INR.RINR",
   unemployment_pct: "SL.UEM.TOTL.ZS",
   gdp_growth_pct: "NY.GDP.MKTP.KD.ZG",
@@ -39,6 +42,7 @@ function fmt(v, digits = 1) {
 }
 
 async function fetchIndicator(indicatorKey, indicatorCode) {
+  // World Bank data for the current year is often incomplete, so we query up to last year.
   const currentYear = new Date().getUTCFullYear() - 1;
   const url =
     `https://api.worldbank.org/v2/country/BRA;GBR;EMU/indicator/${indicatorCode}` +
@@ -127,7 +131,7 @@ function plotMetric(elementId, metric, yLabel) {
       y: countryRows.map((r) => r[metric]),
       mode: "lines+markers",
       name: country,
-      line: { color: Object.values(COUNTRIES).find((c) => c.name === country)?.color || "#333" },
+      line: { color: COUNTRY_COLOR_BY_NAME[country] || "#333" },
     };
   });
 
@@ -159,7 +163,7 @@ function renderKpis() {
         <article class="kpi-card">
           <h3>${country} — ${Number.isFinite(latestYear) ? latestYear : "n/a"}</h3>
           <ul>
-            <li>Inflation: ${fmt(r?.inflation_pct)}%</li>
+            <li>Inflation: ${fmt(r?.inflation_annual_pct)}%</li>
             <li>Real interest rate: ${fmt(r?.real_interest_rate_pct)}%</li>
             <li>Unemployment: ${fmt(r?.unemployment_pct)}%</li>
             <li>GDP growth: ${fmt(r?.gdp_growth_pct)}%</li>
@@ -184,7 +188,7 @@ function renderInsights() {
     return values.sort((a, b) => (sortDesc ? b.value - a.value : a.value - b.value));
   };
 
-  const inflation = avgByCountry("inflation_pct", true);
+  const inflation = avgByCountry("inflation_annual_pct", true);
   const unemployment = avgByCountry("unemployment_pct", false);
   const gdp = avgByCountry("gdp_growth_pct", true);
 
@@ -201,7 +205,7 @@ function renderInsights() {
 function renderAll() {
   renderKpis();
   renderInsights();
-  plotMetric("inflationChart", "inflation_pct", "Inflation (%)");
+  plotMetric("inflationChart", "inflation_annual_pct", "Inflation (%)");
   plotMetric("realRateChart", "real_interest_rate_pct", "Real interest rate (%)");
   plotMetric("unemploymentChart", "unemployment_pct", "Unemployment (%)");
   plotMetric("gdpChart", "gdp_growth_pct", "GDP growth (%)");
