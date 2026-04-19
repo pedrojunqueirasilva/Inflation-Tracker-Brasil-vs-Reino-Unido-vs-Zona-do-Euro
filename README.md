@@ -32,6 +32,41 @@ pip install -r requirements.txt
 python scripts/run_pipeline.py
 ```
 
+## Web Dashboard (English, Vercel-ready)
+This repository now includes a browser dashboard in English:
+- `index.html`
+- `styles.css`
+- `app.js`
+- `vercel.json`
+
+The dashboard loads data directly from the World Bank API, applies country/year filters, and renders:
+- KPI cards by country (latest year in range)
+- Key insights (post-2021)
+- Inflation, real interest rate, unemployment, GDP growth, and FX index charts
+
+### Run locally
+Use a simple static server from the project root:
+```bash
+python -m http.server 8000
+```
+Then open `http://localhost:8000`.
+
+### Deploy on Vercel (step by step)
+1. Push your branch to GitHub.
+2. Log in to Vercel: https://vercel.com
+3. Click **Add New...** → **Project**.
+4. Import this GitHub repository.
+5. In project settings:
+   - Framework Preset: **Other**
+   - Build Command: *(leave empty)*
+   - Output Directory: *(leave empty, root project)*
+6. Click **Deploy**.
+7. After deploy, open the generated Vercel URL and verify the charts load.
+
+Notes:
+- `vercel.json` is already configured for a clean static deployment.
+- The dashboard requires internet access in the browser to reach `api.worldbank.org`.
+
 ## Outputs
 - Raw tidy data: `data/raw/world_bank_tidy_indicators.csv`
 - Processed analytical panel: `data/processed/macro_panel.csv`

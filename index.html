@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inflation Tracker Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Inflation Tracker Dashboard</h1>
+      <p>Brazil vs United Kingdom vs Euro Area</p>
+    </header>
+
+    <section class="filters">
+      <div class="filter-group">
+        <label for="countrySelect">Countries</label>
+        <select id="countrySelect" multiple>
+          <option value="Brazil" selected>Brazil</option>
+          <option value="United Kingdom" selected>United Kingdom</option>
+          <option value="Euro Area" selected>Euro Area</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="startYear">Start year</label>
+        <select id="startYear"></select>
+      </div>
+      <div class="filter-group">
+        <label for="endYear">End year</label>
+        <select id="endYear"></select>
+      </div>
+      <button id="applyFiltersBtn">Apply filters</button>
+    </section>
+
+    <section id="kpiCards" class="kpi-grid"></section>
+    <section id="insights" class="insights"></section>
+
+    <section class="chart-grid">
+      <article class="chart-card"><h2>Inflation (annual %)</h2><div id="inflationChart"></div></article>
+      <article class="chart-card"><h2>Real interest rate (%)</h2><div id="realRateChart"></div></article>
+      <article class="chart-card"><h2>Unemployment (% of labour force)</h2><div id="unemploymentChart"></div></article>
+      <article class="chart-card"><h2>GDP growth (annual %)</h2><div id="gdpChart"></div></article>
+      <article class="chart-card full-width"><h2>Exchange-rate index (2019=100)</h2><div id="fxChart"></div></article>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
